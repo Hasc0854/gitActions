@@ -28,12 +28,12 @@ jobs:
 
     - name: Save JSON if not cached
       if: ${{ steps.cache-json.outputs.cache-hit != 'true' }}
-      uses: devops-actions/json-tofile@v1.0.0   
+      uses: devops-actions/json-to-file@v1.0.0
       with:
         json: |
           '{"name": "pipelines","activity": 3,"module": 2,"isRequired": false}'
         filename: 'archivo.json'
-
+      
     - name: Upload JSON artifact
       uses: actions/upload-artifact@v4
       with:
