@@ -1,49 +1,42 @@
-name: export images form nasa api
-
+name: export images from NASA API
 on:
   push:
     branches:
       - main
- 
 jobs:
   images:
-    name: exportar imagen
-    runs-on: ubuntu-latest
-    
+    name: export image
+    runs-on: Ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: load dates JSON
+        id: load-dates JSON
+        run: |
+          DATES=$(cat dates.json | jq -r '.dates[]')
+          echo "DATES=${DATES}">> $github_env
+      - name: parallel for dates
+        uses: actions/cache@v4
+        with:
+          path: dates.json
+          key: nasa-images-${{runner.os}}-${{hashFiles('**/dates.json')}}
+        id: nasa-images
+      - name: get images from nasa with date
+        if: ${{steps.cache-nasa-images.outputs.cache-hit !='true'}}
+        run: >
+          for DATE in $DATE; do
+            echo "get images from nasa with date: $DATE"
 
-    - name: load dates json
-      id: load- dates json
-      run: |
-        DATES=$(cat dates.json | jq -r '.dates[]')
-        echo "DATES=${DATES}">> $github_env
-
-    - name: paralelo for dates
-      uses: actions/cache@v4
-      with:
-        path: dates.json
-        key: nasa-images-${{ runner.os }}-${{ hashFiles('**/dates.json') }}
-      id: nasa-images 
-
-    - name: get images from nasa with date
-      if: ${{steps.cache-nasa-images.outputs.cache-hit != 'true'}}
-      run: |
-        for DATE in $DATE; do
-          echo "get images from nasa with date: $DATE"
-
-          RESPONSE=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=$DATE")
-          URL=$(echo $RESPONSE | jq -r '.url')
+            RESPONSE=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATE")
+            URL=$(echo $RESPONSE | jq -r '.url')
 
 
-          CACHE_FILE="cache/nasa_image_$DATE.json"
-          echo $RESPONSE > $CACHE_FILE
+            CACHE_FILE="cache/nasa_image_$DATE.json"
+            echo $RESPONSE > $CACHE_FILE
 
-          curl -s $URL --output img-$DATE.jpg
-    
-    - name: Upload JSON artifact for $DATES
-      uses: actions/upload-artifact@v3
-      with:
-        name: img-${DATE}
-        path: img-${DATE}.jpg
+            curl -s $URL --output img-$DATE.jpg
+      - name: Upload JSON artifact for $DATES
+        uses: actions/upload-artifact@v3
+        with:
+          name: img-${DATE}
+          path: img-${DATE}.jpg
