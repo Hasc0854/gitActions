@@ -10,11 +10,13 @@ jobs:
     steps:
       - name: Checkout_repository
         uses: actions/checkout@v4
-      - name: load_dates_JSON
-        id: load_dates_JSON
+
+      - name: load dates JSON
+        id: load-dates
         run: |
-          DATE=$(cat dates.json | jq -r '.dates[]')
+          DATES=$(cat dates.json | jq -r '.dates[]')
           echo "DATE=${DATE}">> $GITHUB_ENV
+
       - name: parallel_for_dates
         uses: actions/cache@v4
         with:
@@ -24,19 +26,17 @@ jobs:
       - name: get_images_from_nasa_with_date
         if: ${{steps.cache-nasa-images.outputs.cache-hit !='true'}}
         run: >
-          for DATE in $DATE; do
-            echo "get images from nasa with date: $DATE"
-
-            RESPONSE=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATE")
+          for DATES in $DATES; do
+            echo "get images from nasa with date: $DATES"
+            RESPONSE=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATES")
             URL=$(echo $RESPONSE | jq -r '.url')
-
-
-            CACHE_FILE="cache/nasa_image_$DATE.json"
+            CACHE_FILE="cache/nasa_image_$DATES.json"
             echo $RESPONSE > $CACHE_FILE
+            
+            curl -s $URL --output img-$DATES.jpg
 
-            curl -s $URL --output img-$DATE.jpg
       - name: Upload_JSON_artifact_for $DATES
         uses: actions/upload-artifact@v3
         with:
-          name: img-${DATE}
-          path: img-${DATE}.jpg
+          name: img-${DATES}
+          path: img-${DATES}.jpg
