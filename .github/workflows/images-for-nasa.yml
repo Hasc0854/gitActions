@@ -34,6 +34,7 @@ jobs:
             echo $RESPONSE > $CACHE_FILE
             
             curl -s $URL --output img-$DATES.jpg
+          done
 
       - name: Upload_JSON_artifact_for $DATES
         uses: actions/upload-artifact@v3
