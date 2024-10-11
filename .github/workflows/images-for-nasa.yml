@@ -17,22 +17,29 @@ jobs:
           DATES=$(cat dates.json | jq -r '.dates[]')
           echo "DATE=${DATE}">> $GITHUB_ENV
 
-      - name: parallel_for_dates
+      - name: parallel for dates
         uses: actions/cache@v4
         with:
           path: dates.json
           key: nasa-images-${{runner.os}}-${{hashFiles('**/dates.json')}}
         id: nasa-images
-      - name: get_images_from_nasa_with_date
+
+      - name: get images from nasa with date
         if: ${{steps.cache-nasa-images.outputs.cache-hit !='true'}}
         run: >
           for DATES in $DATES; do
-            echo "get images from nasa with date: $DATES"
-            RESPONSE=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATES")
-            URL=$(echo $RESPONSE | jq -r '.url')
-            CACHE_FILE="cache/nasa_image_$DATES.json"
-            echo $RESPONSE > $CACHE_FILE
-            
+          uses: githubocto/requests-action@v2
+          id: get-nasa-image
+          with:
+            url: "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATES"
+            method: GET
+      - name : extract imagesfrom reponse
+        run: |
+          RESPONSE=$(cat ${{ steps.get-nasa-image.outputs.response }})
+          URL=$(echo $RESPONSE | jq -r '.url')
+          CACHE_FILE="cache/nasa_image_$DATES.json"
+          echo $RESPONSE > $CACHE_FILE
+
             curl -s $URL --output img-$DATES.jpg
           done
 
