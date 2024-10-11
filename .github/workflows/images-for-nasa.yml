@@ -18,7 +18,7 @@ jobs:
       - name: Load Dates JSON
         id: get_dates
         run: |
-          DATES=$(cat dates.json | jq -r '.dates | join(",")')
+          DATES=$(cat dates.json | jq -c '.dates' dates.json)
           echo "::set-output name=dates::${DATES}"
 
   nasa-images:
