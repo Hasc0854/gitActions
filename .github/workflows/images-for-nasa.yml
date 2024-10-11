@@ -1,50 +1,53 @@
-name: export images from NASA API
+name: Export Images from NASA API
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  images:
-    name: export_image
-    runs-on: Ubuntu-latest
+  read-dates:
+    runs-on: ubuntu-latest
+    outputs:
+      dates: ${{ steps.get_dates.outputs.dates }}
+
     steps:
-      - name: Checkout_repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: load dates JSON
-        id: load-dates
+      - name: Load Dates JSON
+        id: get_dates
         run: |
-          DATES=$(cat dates.json | jq -r '.dates[]')
-          echo "DATE=${DATE}">> $GITHUB_ENV
+          DATES=$(cat dates.json | jq -r '.dates | join(",")')
+          echo "dates=${DATES}" >> $GITHUB_ENV
+          echo "::set-output name=dates::${DATES}"
 
-      - name: parallel for dates
-        uses: actions/cache@v4
+  nasa-images:
+    needs: read-dates
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        date: ${{ fromJson(env.dates) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Image
+        uses: githubocto/requests-action@v2
+        id: get-nasa-image
         with:
-          path: dates.json
-          key: nasa-images-${{runner.os}}-${{hashFiles('**/dates.json')}}
-        id: nasa-images
+          url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
+          method: GET
 
-      - name: get images from nasa with date
-        if: ${{steps.cache-nasa-images.outputs.cache-hit !='true'}}
-        run: >
-          for DATES in $DATES; do
-          uses: githubocto/requests-action@v2
-          id: get-nasa-image
-          with:
-            url: "https://api.nasa.gov/planetary/apod?api_key=${{secrets.API_KEY}}&date=$DATES"
-            method: GET
-      - name : extract imagesfrom reponse
+      - name: Download Image
         run: |
-          RESPONSE=$(cat ${{ steps.get-nasa-image.outputs.response }})
-          URL=$(echo $RESPONSE | jq -r '.url')
-          CACHE_FILE="cache/nasa_image_$DATES.json"
-          echo $RESPONSE > $CACHE_FILE
+          URL=$(echo ${{ steps.get-nasa-image.outputs.response }} | jq -r '.url')
+          curl -s $URL --output img-${{ matrix.date }}.jpg
 
-            curl -s $URL --output img-$DATES.jpg
-          done
-
-      - name: Upload_JSON_artifact_for $DATES
+      - name: Upload JSON Artifact for ${{ matrix.date }}
         uses: actions/upload-artifact@v3
         with:
-          name: img-${DATES}
-          path: img-${DATES}.jpg
+          name: img-${{ matrix.date }}
+          path: img-${{ matrix.date }}.jpg
