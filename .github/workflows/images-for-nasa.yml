@@ -27,7 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        date: ${{ fromJson(env.dates) }}
+        date: ${{ fromJson(needs.read-dates.outputs.dates) }}
 
     steps:
       - name: Checkout
