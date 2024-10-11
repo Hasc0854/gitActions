@@ -5,23 +5,23 @@ on:
       - main
 jobs:
   images:
-    name: export image
+    name: export_image
     runs-on: Ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout_repository
         uses: actions/checkout@v4
-      - name: load dates JSON
-        id: load-dates JSON
+      - name: load_dates_JSON
+        id: load_dates_JSON
         run: |
           DATES=$(cat dates.json | jq -r '.dates[]')
           echo "DATES=${DATES}">> $github_env
-      - name: parallel for dates
+      - name: parallel_for_dates
         uses: actions/cache@v4
         with:
           path: dates.json
           key: nasa-images-${{runner.os}}-${{hashFiles('**/dates.json')}}
         id: nasa-images
-      - name: get images from nasa with date
+      - name: get_images_from_nasa_with_date
         if: ${{steps.cache-nasa-images.outputs.cache-hit !='true'}}
         run: >
           for DATE in $DATE; do
@@ -35,7 +35,7 @@ jobs:
             echo $RESPONSE > $CACHE_FILE
 
             curl -s $URL --output img-$DATE.jpg
-      - name: Upload JSON artifact for $DATES
+      - name: Upload_JSON_artifact_for $DATES
         uses: actions/upload-artifact@v3
         with:
           name: img-${DATE}
