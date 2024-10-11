@@ -13,8 +13,8 @@ jobs:
       - name: load_dates_JSON
         id: load_dates_JSON
         run: |
-          DATES=$(cat dates.json | jq -r '.dates[]')
-          echo "DATES=${DATES}">> $github_env
+          DATE=$(cat dates.json | jq -r '.dates[]')
+          echo "DATE=${DATE}">> $github_env
       - name: parallel_for_dates
         uses: actions/cache@v4
         with:
