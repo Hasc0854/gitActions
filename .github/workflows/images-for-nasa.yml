@@ -19,7 +19,6 @@ jobs:
         id: get_dates
         run: |
           DATES=$(cat dates.json | jq -r '.dates | join(",")')
-          echo "dates=${DATES}" >> $GITHUB_ENV
           echo "::set-output name=dates::${DATES}"
 
   nasa-images:
