@@ -50,7 +50,7 @@ jobs:
             curl -s "$URL" --output "img-${{ matrix.date }}.jpg"
 
       - name: Upload JSON Artifact for ${{ matrix.date }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: img-${{ matrix.date }}
           path: img-${{ matrix.date }}.jpg
