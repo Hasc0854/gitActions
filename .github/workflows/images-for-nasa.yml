@@ -34,13 +34,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: consultar api de la NASA por fecha
-        uses: fjogeleit/http-request-action@v1
-        id: get-from-image
-        with:
-          url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
-          method: GET
-
       - name: Save NASA image from URL 
         uses: minituff/save-image@v1.4
         id: wakatime
