@@ -42,7 +42,8 @@ jobs:
 
       - name: Descargar imagen de la NASA
         run: |
-          URL=$(echo "${{ steps.get-from-image.outputs.response }}" | jq -c '.url')
+          echo "Respuesta de la API: ${{ steps.get-from-image.outputs.response }}"
+          URL=$(echo '${{ steps.get-from-image.outputs.response }}' | jq -c '.url')
           curl -s "$URL" --output img-${{ matrix.date }}.jpg
 
       - name: Upload JSON Artifact for ${{ matrix.date }}
