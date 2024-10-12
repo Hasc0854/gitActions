@@ -42,7 +42,7 @@ jobs:
           method: GET
 
       - name: Save NASA image from URL 
-        uses: minituff/save-image@v1
+        uses: minituff/save-image@v1.4
         id: wakatime
         with:
           url: 'https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}'
