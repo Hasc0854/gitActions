@@ -29,25 +29,27 @@ jobs:
     strategy:
       matrix:
         date: ${{ fromJson(needs.read-dates.outputs.dates) }}   
-        env:
-            ENV_URL: 'https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: set variable url nasa
+        run: |
+          echo "ENV_URL:https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}" >> $GITHUB_ENV
+
       - name: consultar api de la NASA por fecha
         uses: fjogeleit/http-request-action@v1
         id: get-from-image
         with:
-          url: 'ENV_URL'
+          url: $ENV_URL
           method: GET
 
       - name: Save NASA image from URL 
         uses: minituff/save-image@v1.4
         id: wakatime
         with:
-          url: 'ENV_URL'
+          url: $ENV_URL
           magePath: '.github/workflows/imagenNasa/img-${{ matrix.date }}.jpg'
 
       - name: Generar artefacto por imagen ${{ matrix.date }}
