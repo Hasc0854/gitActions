@@ -39,7 +39,7 @@ jobs:
         id: wakatime
         with:
           url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
-          magePath: '.github/workflows/imagenNasa/img-${{ matrix.date }}.jpg'
+          imagePath: 'img-${{ matrix.date }}.jpg'
 
       - name: Generar artefacto por imagen ${{ matrix.date }}
         uses: actions/upload-artifact@v4
