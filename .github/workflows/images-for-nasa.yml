@@ -1,4 +1,4 @@
-name: Export Images from NASA API
+name: crear un artefacto desde el api de la NASA
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Leer el JSON
+      - name: Leer el JSON del repositorio
         id: get_dates
         run: |
           DATES=$(jq -c '.dates' dates.json)
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Obtener imagen de la NASA
+      - name: consultar api de la NASA por fecha
         uses: fjogeleit/http-request-action@v1
         id: get-from-image
         with:
@@ -49,9 +49,8 @@ jobs:
             
             curl -s "$URL" --output "img-${{ matrix.date }}.jpg"
 
-      - name: Upload JSON Artifact for ${{ matrix.date }}
+      - name: Generar artefacto por imagen ${{ matrix.date }}
         uses: actions/upload-artifact@v4
         with:
           name: img-${{ matrix.date }}
           path: img-${{ matrix.date }}.jpg
-
