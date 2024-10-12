@@ -42,12 +42,12 @@ jobs:
           method: GET
 
 
-      - name: Descargar imagen de la NASA
-        run: |
-            URL=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}" \
-            | jq -r '.url')
-            
-            curl -s "$URL" --output "img-${{ matrix.date }}.jpg"
+      - name: Save NASA image from URL 
+        uses: minituff/save-image
+        id: wakatime
+        with:
+          url: 'https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}'
+          imagePath: 'img-${{ matrix.date }}.jpg'
 
       - name: Generar artefacto por imagen ${{ matrix.date }}
         uses: actions/upload-artifact@v4
