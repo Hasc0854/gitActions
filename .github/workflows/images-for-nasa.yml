@@ -45,7 +45,7 @@ jobs:
       - name: Descargar imagen de la NASA
         run: |
             URL=$(curl -s "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}" \
-            | jq -r '.url') | xargs curl -O
+            | jq -r '.url')
             
             curl -s "$URL" --output "img-${{ matrix.date }}.jpg"
 
