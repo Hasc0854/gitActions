@@ -18,7 +18,7 @@ jobs:
       - name: leer el JSON
         id: get_dates
         run: |
-          DATES=$(cat dates.json | jq -c '.dates' dates.json)
+          DATES=$(cat dates.json | jq -r '.dates' dates.json)
           echo "::set-output name=dates::${DATES}"
 
   nasa-images:
@@ -43,7 +43,7 @@ jobs:
       - name: Descargar imagen de la NASA
         run: |
           echo "Respuesta de la API: ${{ steps.get-from-image.outputs.response }}"
-          URL=$(echo '${{ steps.get-from-image.outputs.response }}' | jq -c '.url')
+          URL=$(echo '${{ steps.get-from-image.outputs.response }}' | jq -r '.url')
           curl -s "$URL" --output img-${{ matrix.date }}.jpg
 
       - name: Upload JSON Artifact for ${{ matrix.date }}
