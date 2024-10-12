@@ -15,11 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: leer el JSON
+      - name: Leer el JSON
         id: get_dates
         run: |
-          DATES=$(cat dates.json | jq -c '.dates' dates.json)
-          echo "::set-output name=dates::${DATES}"
+          DATES=$(jq -c '.dates' dates.json)
+          echo "dates=$DATES" >> $GITHUB_ENV
+          echo "dates=$DATES" >> $GITHUB_OUTPUT
 
   nasa-images:
     needs: read-dates
@@ -33,7 +34,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: obtener imagen de la nasa
+      - name: Obtener imagen de la NASA
         uses: fjogeleit/http-request-action@v1
         id: get-from-image
         with:
@@ -50,3 +51,4 @@ jobs:
         with:
           name: img-${{ matrix.date }}
           path: img-${{ matrix.date }}.jpg
+
