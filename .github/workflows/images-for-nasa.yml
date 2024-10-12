@@ -41,10 +41,16 @@ jobs:
           url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
           method: GET
 
+
       - name: Descargar imagen de la NASA
         run: |
-            URL=$(echo "${{ steps.get-from-image.outputs.response }}" | jq -r '.url')
-            curl -s "$URL" --output img-${{ matrix.date }}.jpg
+            # Extraer la URL de la respuesta JSON y descargar la imagen
+            curl -s "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}" \
+            | jq -r '.url' \
+            | xargs curl -O
+            
+            # Renombrar la imagen descargada
+            mv "url" "img-${{ matrix.date }}.jpg"    
 
       - name: Upload JSON Artifact for ${{ matrix.date }}
         uses: actions/upload-artifact@v3
