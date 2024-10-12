@@ -38,14 +38,14 @@ jobs:
         uses: fjogeleit/http-request-action@v1
         id: get-from-image
         with:
-          url: 'https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}'
+          url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
           method: GET
 
       - name: Save NASA image from URL 
         uses: minituff/save-image@v1.4
         id: wakatime
         with:
-          url: url: 'https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}'
+          url: "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.API_KEY }}&date=${{ matrix.date }}"
           magePath: '.github/workflows/imagenNasa/img-${{ matrix.date }}.jpg'
 
       - name: Generar artefacto por imagen ${{ matrix.date }}
