@@ -43,8 +43,10 @@ jobs:
 
       - name: Descargar imagen de la NASA
         run: |
-          URL=$(echo '${{ steps.get-from-image.outputs.response }}' | jq -r '.url')
-          curl -s "$URL" --output img-${{ matrix.date }}.jpg
+            # Extraer la URL de la respuesta JSON
+            URL=$(echo "${{ steps.get-from-image.outputs.response }}" | jq -r '.url')
+            echo "URL de la imagen: $URL" # Para depuración
+            curl -s "$URL" --output img-${{ matrix.date }}.jpg
 
       - name: Upload JSON Artifact for ${{ matrix.date }}
         uses: actions/upload-artifact@v3
